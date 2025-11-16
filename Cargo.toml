@@ -1,0 +1,19 @@
+[package]
+name = "ficwright"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap.version = "4.5.51"
+clap.features = ["color", "derive", "error-context", "help", "suggestions", "usage", "unicode", "wrap_help"]
+serde.version = "1.0.228"
+serde.features = ["derive"]
+regex = "1.11.3"
+tokio.version = "1.48.0"
+tokio.features = ["full", "io-util"]
+tokio-util.version = "0.7.17"
+toml.version = "0.9.8"
+thirtyfour.version = "0.36.1"
+thirtyfour.features = ["component"]
+rootcause.version = "0.7.0"
+rootcause.features = [ "std", "backtrace" ]
