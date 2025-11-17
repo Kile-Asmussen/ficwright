@@ -100,6 +100,10 @@ pub struct FicDetails {
     #[serde(default)]
     pub url: String,
     #[serde(default)]
+    pub author_pseud: Option<String>,
+    #[serde(default)]
+    pub co_authors: Vec<String>,
+    #[serde(default)]
     pub title: String,
     #[serde(default)]
     pub file: Option<PathBuf>,
@@ -114,6 +118,21 @@ pub struct FicDetails {
 #[derive(Debug, Clone, Serialize, Default, Deserialize)]
 pub struct FicMeta {
     pub format: FileFormat,
+    pub language: String,
+    #[serde(default)]
+    pub challenges: Vec<String>,
+    #[serde(default)]
+    pub gift_to: Vec<String>,
+    #[serde(default)]
+    pub work_skin: Option<String>,
+    #[serde(default)]
+    pub total_chapters: u64,
+    #[serde(default)]
+    pub is_remixes_of: Option<String>,
+    #[serde(default)]
+    pub in_series: Option<String>,
+    #[serde(default)]
+    pub publication_date: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default, Parser)]
