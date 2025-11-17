@@ -1,4 +1,4 @@
-use std::{path::PathBuf, time::Duration};
+use std::path::PathBuf;
 
 use clap::Parser;
 use rootcause::bail;
@@ -44,7 +44,7 @@ impl WebRunnable for Ao3PostNew {
 
         work_form.set_tags(&self.loaded.tags).await?;
 
-        prompt("Enter to continue...").await;
+        prompt("Enter to continue...").await?;
 
         Ok(())
     }

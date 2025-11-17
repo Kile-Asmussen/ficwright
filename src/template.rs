@@ -23,6 +23,8 @@ impl Runnable for TemplateCommand {
                     start_note: Some("".into()),
                     end_note: Some("".into()),
                     summary: Some("Presented without summary".into()),
+                    author_pseud: None,
+                    co_authors: vec![],
                 },
                 tags: Default::default(),
                 meta: Default::default(),
