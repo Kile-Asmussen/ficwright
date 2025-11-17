@@ -1,0 +1,21 @@
+[fic]
+url = ""
+title = "Untitled"
+file = "untitled.md"
+start_note = ""
+end_note = ""
+summary = "Presented without summary"
+
+[tags]
+rating = "Mature"
+warnings = ["Chose Not To Use Archive Warnings"]
+fandoms = ["Original Work", "Pride and Prejudice - Jane Austen"]
+categories = ["Gen"]
+relationships = ["Original Character/Original Character"]
+characters = ["Original Characters"]
+other = ["This is a very silly thing"]
+
+[meta]
+format = "Markdown"
+
+[chapters]

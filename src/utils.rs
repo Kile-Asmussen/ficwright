@@ -53,6 +53,30 @@ macro_rules! ix_map {
     }}
 }
 
+#[macro_export]
+macro_rules! ix_set {
+    {} => {{
+        indexmap::IndexSet::new()
+    }};
+    { $( $value:expr ),* $(,)? } => {{
+        let mut set = indexmap::IndexSet::new();
+        $( set.insert($value); )*
+        set
+    }}
+}
+
+#[macro_export]
+macro_rules! tree_set {
+    {} => {{
+        std::collections::BTreeSet::new()
+    }};
+    { $( $value:expr ),* $(,)? } => {{
+        let mut set = std::collections::BTreeSet::new();
+        $( set.insert($value); )*
+        set
+    }}
+}
+
 pub use ix_map;
 
 pub async fn print_to_async<T>(args: fmt::Arguments<'_>, global_s: fn() -> T, label: &str)
@@ -73,9 +97,9 @@ macro_rules! print_async {
     () => {
         async {}
     };
-    ($($arg:tt)*) => {async {
-        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stdout, "stdout").await;
-    }};
+    ($($arg:tt)*) => {
+        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stdout, "stdout")
+    };
 }
 
 pub use print_async;
@@ -83,11 +107,11 @@ pub use print_async;
 #[macro_export]
 macro_rules! println_async {
     () => {async {
-        $crate::utils::print_async!("\n").await;
+        $crate::utils::print_async!("\n")
     }};
-    ($($arg:tt)*) => {async {
-        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stdout, "stdout").await;
-    }};
+    ($($arg:tt)*) => {
+        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stdout, "stdout")
+    };
 }
 
 pub use println_async;
@@ -98,7 +122,7 @@ macro_rules! eprint_async {
         async {}
     };
     ($($arg:tt)*) => {async {
-        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stderr, "stderr").await;
+        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stderr, "stderr")
     }};
 }
 
@@ -107,11 +131,11 @@ pub use eprint_async;
 #[macro_export]
 macro_rules! eprintln_async {
     () => {async {
-        $crate::utils::eprint_async!("\n").await;
+        $crate::utils::eprint_async!("\n")
     }};
-    ($($arg:tt)*) => {async {
-        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stderr, "stderr").await;
-    }};
+    ($($arg:tt)*) => {
+        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stderr, "stderr")
+    };
 }
 
 pub use eprintln_async;

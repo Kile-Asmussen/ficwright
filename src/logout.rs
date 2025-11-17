@@ -1,36 +1,25 @@
 use clap::Parser;
-use rootcause::bail;
+use thirtyfour::prelude::*;
 
-use crate::{command::*, utils::*, *};
+use crate::{command::*, driver::DriverExts, *};
 
 #[derive(Debug, Clone, Parser)]
 pub struct Ao3Logout {
-    #[clap(short = 'f')]
-    pub force: bool,
+    #[clap(short = 'k')]
+    pub keep: bool,
 }
 
-impl Runnable for Ao3Logout {
-    async fn run(&self, driver: &mut WebDriver, opt: &FicwrightOpts) -> Result<()> {
-        let Some(cookies) = opt.user().await? else {
-            bail!("No cookie file found: {}", opt.cookies.to_string_lossy());
-        };
+impl WebRunnable for Ao3Logout {
+    async fn run(self, driver: &mut WebDriver, opt: Ao3Opts) -> Result<()> {
+        driver.add_cookies(&opt.get_cookies().await?).await?;
 
-        driver.goto(AO3).await?;
+        driver
+            .find(By::Css("a[data-method=\"delete\"]"))
+            .await?
+            .click()
+            .await?;
 
-        for cookie in cookies.iter() {
-            driver.add_cookie(cookie).await?;
-        }
-
-        driver.refresh().await?;
-
-        let mut delete = self.force;
-
-        if !delete {
-            let s = prompt("Delete cookie file? [y/N]").await?;
-            delete = s.contains("y") || s.contains("Y")
-        }
-
-        if delete {
+        if !self.keep {
             tokio::fs::remove_file(&opt.cookies).await?;
         }
 

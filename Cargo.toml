@@ -4,6 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+indexmap.version = "2.12.0"
+indexmap.features = [ "serde" ]
 clap.version = "4.5.51"
 clap.features = ["color", "derive", "error-context", "help", "suggestions", "usage", "unicode", "wrap_help"]
 serde.version = "1.0.228"

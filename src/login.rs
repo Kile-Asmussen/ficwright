@@ -1,38 +1,29 @@
-use std::path::PathBuf;
-
-use crate::{command::*, config::*, utils::*, *};
+use crate::{command::*, config::*, driver::DriverExts, utils::*, *};
 use clap::Parser;
-use thirtyfour::By;
+use thirtyfour::prelude::*;
 
 #[derive(Debug, Clone, Parser)]
-pub struct Ao3Login {
-    #[clap(long, short = 'o', default_value = ".cookies")]
-    pub output: PathBuf,
-}
+pub struct Ao3Login {}
 
-impl Runnable for Ao3Login {
-    async fn run(&self, driver: &mut WebDriver, opt: &FicwrightOpts) -> Result<()> {
-        driver.goto(AO3).await?;
-
-        if let Some(user) = opt.user().await? {
-            for cookie in user.iter() {
-                driver.add_cookie(cookie).await?;
-            }
-            driver.refresh().await?;
+impl WebRunnable for Ao3Login {
+    async fn run(self, driver: &mut WebDriver, opt: Ao3Opts) -> Result<()> {
+        if let Ok(cookies) = opt.get_cookies().await {
+            driver.add_cookies(&cookies).await?;
 
             let yn = prompt("Are you logged in? [Y/n]").await?;
 
             if yn.contains('n') || yn.contains('N') {
-                println_async!("Deleting {}", opt.cookies.to_string_lossy()).await;
+                println_async!(
+                    "Deleting unusable cookie file: {}",
+                    opt.cookies.to_string_lossy()
+                )
+                .await;
                 tokio::fs::remove_file(&opt.cookies).await?;
             }
+
+            return Ok(());
         } else {
             driver.find(By::Id("login-dropdown")).await?.click().await?;
-            driver
-                .find(By::Name("user[remember_me]"))
-                .await?
-                .click()
-                .await?;
             driver
                 .find(By::Id("user_session_login_small"))
                 .await?
@@ -42,14 +33,11 @@ impl Runnable for Ao3Login {
             prompt("Please log in... [Enter to continue]").await?;
         }
 
-        let cookies = driver.get_all_cookies().await?;
+        CookieConfig::new(driver.get_all_cookies().await?)
+            .save_to_file(&opt.cookies)
+            .await?;
 
-        let cookies = cookies.into_iter().map(|c| (c.name, c.value)).collect();
-
-        let cookies = CookieConfig { cookies };
-        cookies.save_to_file(&self.output).await?;
-
-        println_async!("Cookies saved to {}", self.output.to_string_lossy()).await;
+        println_async!("Cookies saved to {}", opt.cookies.to_string_lossy()).await;
 
         Ok(())
     }
