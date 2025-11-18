@@ -1,5 +1,6 @@
 #![feature(format_args_nl)]
 #![feature(associated_type_defaults)]
+#![allow(unused)]
 
 use clap::Parser;
 use rootcause::Report;
@@ -9,11 +10,8 @@ use crate::command::Ficwright;
 pub mod command;
 pub mod config;
 pub mod driver;
-pub mod login;
-pub mod logout;
-pub mod look;
-pub mod post_new;
-pub mod template;
+
+pub mod forms;
 pub mod utils;
 
 type Result<X> = std::result::Result<X, Report>;

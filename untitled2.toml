@@ -1,27 +1,24 @@
 [fic]
-url = ""
-co_authors = []
-title = "Untitled"
+title = "Untitled 2"
+co_authors = ["Sub_Rosa"]
 file = "untitled.md"
-start_note = ""
-end_note = ""
+start_note = "Test"
+end_note = "Test"
 summary = "Presented without summary"
 
 [tags]
-rating = "Not Rated"
-warnings = ["Chose Not To Use Archive Warnings"]
-fandoms = []
-categories = []
-relationships = []
-characters = []
-other = []
+rating = "Mature"
+warnings = ["Graphic Depictions Of Violence"]
+fandoms = ["呪術廻戦 | Jujutsu Kaisen (Manga)"]
+categories = ["F/F"]
+relationships = ["Fushiguro Megumi/Inumaki Toge"]
+characters = ["Itadori Yuji"]
+other = ["Trans Character"]
 
 [meta]
 format = "Markdown"
-language = ""
-challenges = []
-gift_to = []
-total_chapters = 0
+language = "English"
+total_chapters = 1
 
 [chapters.01]
 url = ""

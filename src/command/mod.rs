@@ -7,17 +7,25 @@ use std::{
 
 use crate::{
     Result,
+    command::{demo_post_new::Ao3DemoPostNew, post_new::Ao3PostNew},
     config::CookieConfig,
     driver::DriverExts,
-    login::Ao3Login,
-    logout::Ao3Logout,
-    look::Ao3Look,
-    post_new::Ao3PostNew,
-    template::{DebugTemplateCommand, TemplateCommand},
+    utils::prompt,
 };
 use clap::{Parser, Subcommand};
+use login::Ao3Login;
+use logout::Ao3Logout;
+use look::Ao3Look;
+use template::{DebugTemplateCommand, TemplateCommand};
 use thirtyfour::prelude::*;
 use tokio::process::Child;
+
+pub mod demo_post_new;
+pub mod login;
+pub mod logout;
+pub mod look;
+pub mod post_new;
+pub mod template;
 
 #[derive(Debug, Parser)]
 pub struct Ficwright {
@@ -133,11 +141,16 @@ struct Ao3Command {
 impl Ao3Command {
     pub async fn run(self) -> Result<()> {
         let mut capabilities = DesiredCapabilities::firefox();
+        capabilities.unset_headless()?;
         let mut driver = WebDriver::new("http://localhost:4444", capabilities).await?;
 
         driver.ao3("").await?;
 
         self.command.run(&mut driver, self.options).await?;
+
+        driver.minimize_window().await?;
+
+        prompt("\n\nEnter to continue...").await?;
 
         driver.quit().await?;
 
@@ -150,6 +163,7 @@ enum Ao3Script {
     Login(Ao3Login),
     Logout(Ao3Logout),
     Look(Ao3Look),
+    DemoPostNew(Ao3DemoPostNew),
     PostNew(Ao3PostNew),
 }
 
@@ -159,6 +173,7 @@ impl WebRunnable for Ao3Script {
             Self::Login(ao3_login) => ao3_login.pre(opts).await,
             Self::Logout(ao3_logout) => ao3_logout.pre(opts).await,
             Self::Look(ao3_look) => ao3_look.pre(opts).await,
+            Self::DemoPostNew(ao3_demo) => ao3_demo.pre(opts).await,
             Self::PostNew(ao3_post_new) => ao3_post_new.pre(opts).await,
         }
     }
@@ -167,6 +182,7 @@ impl WebRunnable for Ao3Script {
             Self::Login(ao3_login) => ao3_login.run(driver, opt).await,
             Self::Logout(ao3_logout) => ao3_logout.run(driver, opt).await,
             Self::Look(ao3_look) => ao3_look.run(driver, opt).await,
+            Self::DemoPostNew(ao3_post_new) => ao3_post_new.run(driver, opt).await,
             Self::PostNew(ao3_post_new) => ao3_post_new.run(driver, opt).await,
         }
     }

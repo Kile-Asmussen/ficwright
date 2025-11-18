@@ -4,7 +4,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWrite, AsyncWriteExt, BufReader, stdin};
 use crate::Result;
 
 pub async fn prompt(s: &str) -> Result<String> {
-    print_async!("{}", s).await;
+    print_async!("{}", s);
     let mut cin = BufReader::new(stdin());
     let mut buf = String::new();
     cin.read_line(&mut buf).await?;
@@ -98,7 +98,7 @@ macro_rules! print_async {
         async {}
     };
     ($($arg:tt)*) => {
-        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stdout, "stdout")
+        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stdout, "stdout").await
     };
 }
 
@@ -110,7 +110,7 @@ macro_rules! println_async {
         $crate::utils::print_async!("\n")
     }};
     ($($arg:tt)*) => {
-        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stdout, "stdout")
+        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stdout, "stdout").await
     };
 }
 
@@ -122,7 +122,7 @@ macro_rules! eprint_async {
         async {}
     };
     ($($arg:tt)*) => {async {
-        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stderr, "stderr")
+        $crate::utils::print_to_async(std::format_args!($($arg)*), tokio::io::stderr, "stderr").await
     }};
 }
 
@@ -134,7 +134,7 @@ macro_rules! eprintln_async {
         $crate::utils::eprint_async!("\n")
     }};
     ($($arg:tt)*) => {
-        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stderr, "stderr")
+        $crate::utils::print_to_async(std::format_args_nl!($($arg)*), tokio::io::stderr, "stderr").await
     };
 }
 
@@ -166,6 +166,6 @@ macro_rules! writeln_async {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
 async fn test_printers() {
-    print_async!("Hello\n").await;
-    println_async!("Hello {}", 2).await;
+    print_async!("Hello\n");
+    println_async!("Hello {}", 2);
 }

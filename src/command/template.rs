@@ -24,7 +24,7 @@ impl Runnable for TemplateCommand {
                     end_note: Some("".into()),
                     summary: Some("Presented without summary".into()),
                     author_pseud: None,
-                    co_authors: vec![],
+                    co_authors: ix_set![],
                 },
                 tags: Default::default(),
                 meta: Default::default(),
@@ -49,8 +49,7 @@ impl Runnable for DebugTemplateCommand {
         println_async!(
             "{:#?}",
             toml::from_str::<Fanfiction>(&tokio::fs::read_to_string(&self.file).await?)?
-        )
-        .await;
+        );
         Ok(())
     }
 }

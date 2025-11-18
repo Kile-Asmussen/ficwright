@@ -16,8 +16,7 @@ impl WebRunnable for Ao3Login {
                 println_async!(
                     "Deleting unusable cookie file: {}",
                     opt.cookies.to_string_lossy()
-                )
-                .await;
+                );
                 tokio::fs::remove_file(&opt.cookies).await?;
             }
 
@@ -37,7 +36,7 @@ impl WebRunnable for Ao3Login {
             .save_to_file(&opt.cookies)
             .await?;
 
-        println_async!("Cookies saved to {}", opt.cookies.to_string_lossy()).await;
+        println_async!("Cookies saved to {}", opt.cookies.to_string_lossy());
 
         Ok(())
     }

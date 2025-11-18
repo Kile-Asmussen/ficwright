@@ -9,15 +9,22 @@ use rootcause::bail;
 use serde::{Deserialize, Serialize};
 use thirtyfour::Cookie;
 
-use crate::{Result, println_async, tree_set};
+use crate::{Result, forms::model::*, println_async, tree_set};
 
 #[derive(Debug, Clone, Serialize, Default, Deserialize)]
 pub struct Fanfiction {
     pub fic: FicDetails,
     pub tags: FicTags,
     pub meta: FicMeta,
+    pub remix: Option<FicRemix>,
     #[serde(default)]
     pub chapters: BTreeMap<String, FicDetails>,
+}
+
+impl Fanfiction {
+    pub async fn load(path: &Path) -> Result<Self> {
+        Ok(toml::from_str(&tokio::fs::read_to_string(path).await?)?)
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,7 +34,7 @@ pub struct FicTags {
     pub warnings: BTreeSet<ArchiveWarning>,
     pub fandoms: IndexSet<String>,
     #[serde(default)]
-    pub categories: IndexSet<FicCategory>,
+    pub categories: BTreeSet<FicCategory>,
     #[serde(default)]
     pub relationships: IndexSet<String>,
     #[serde(default)]
@@ -50,51 +57,6 @@ impl Default for FicTags {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub enum FicCategory {
-    #[serde(rename = "F/F")]
-    FF,
-    #[serde(rename = "M/M")]
-    MM,
-    #[serde(rename = "F/M")]
-    FM,
-    Gen,
-    Multi,
-    Other,
-}
-
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ArchiveWarning {
-    #[serde(rename = "Chose Not To Use Archive Warnings")]
-    #[default]
-    CNTUAW,
-    #[serde(rename = "Graphic Depictions of Violence")]
-    Violence,
-    #[serde(rename = "Major Character Death")]
-    MCDeath,
-    #[serde(rename = "No Archive Warnings Apply")]
-    NA,
-    #[serde(rename = "Rape/Non-Con")]
-    NonCon,
-    #[serde(rename = "Underage Sex")]
-    Underage,
-}
-
-#[derive(Debug, Clone, Copy, Default, Serialize, Deserialize, PartialEq, Eq, Hash)]
-pub enum AgeRating {
-    #[serde(rename = "Not Rated")]
-    #[default]
-    NotRated,
-    #[serde(rename = "General Audiences")]
-    GenAud,
-    #[serde(rename = "Teen And Up Audiences")]
-    TeenAud,
-    #[serde(rename = "Mature")]
-    MatureAud,
-    #[serde(rename = "Explicit")]
-    Explicit,
-}
-
 #[derive(Debug, Clone, Serialize, Default, Deserialize)]
 pub struct FicDetails {
     #[serde(default)]
@@ -102,7 +64,7 @@ pub struct FicDetails {
     #[serde(default)]
     pub author_pseud: Option<String>,
     #[serde(default)]
-    pub co_authors: Vec<String>,
+    pub co_authors: IndexSet<String>,
     #[serde(default)]
     pub title: String,
     #[serde(default)]
@@ -120,37 +82,26 @@ pub struct FicMeta {
     pub format: FileFormat,
     pub language: String,
     #[serde(default)]
-    pub challenges: Vec<String>,
+    pub challenges: IndexSet<String>,
     #[serde(default)]
-    pub gift_to: Vec<String>,
+    pub gift_to: IndexSet<String>,
     #[serde(default)]
     pub work_skin: Option<String>,
     #[serde(default)]
     pub total_chapters: u64,
-    #[serde(default)]
-    pub is_remixes_of: Option<String>,
     #[serde(default)]
     pub in_series: Option<String>,
     #[serde(default)]
     pub publication_date: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, Default, Parser)]
-pub enum FileFormat {
-    Typst,
-    #[default]
-    Markdown,
-    HTML,
-}
-
-pub fn enum_as_string<T: Serialize>(e: &T) -> Result<String> {
-    let mut buf = String::new();
-    e.serialize(toml::ser::ValueSerializer::new(&mut buf))?;
-    let val = buf.parse::<toml::Value>()?;
-    match val {
-        toml::Value::String(s) => return Ok(s),
-        val => bail!("Not a string: {}", val),
-    }
+#[derive(Debug, Clone, Serialize, Default, Deserialize)]
+pub struct FicRemix {
+    pub url: String,
+    pub title: String,
+    pub author: String,
+    pub language: String,
+    pub translated: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -171,7 +122,7 @@ impl CookieConfig {
     }
 
     pub async fn read_from_file(file: &Path) -> Result<Self> {
-        println_async!("Reading cookie file: {}", file.to_string_lossy()).await;
+        println_async!("Reading cookie file: {}", file.to_string_lossy());
         let file = if let Ok(f) = file.strip_prefix("~/") {
             let home = PathBuf::from(std::env::var("HOME")?);
             home.join(f)
@@ -181,14 +132,14 @@ impl CookieConfig {
         let contents = match tokio::fs::read_to_string(&file).await {
             Ok(ok) => ok,
             Err(e) => {
-                println_async!("Fauled to read cookie file: {}", e.kind()).await;
+                println_async!("Fauled to read cookie file: {}", e.kind());
                 bail!(e)
             }
         };
         Ok(match toml::from_str::<Self>(&contents) {
             Ok(cookies) => cookies,
             Err(e) => {
-                println_async!("Failed to read cookie file: {}", e.message()).await;
+                println_async!("Failed to read cookie file: {}", e.message());
                 bail!(e)
             }
         })
