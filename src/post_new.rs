@@ -58,10 +58,13 @@ pub struct PostNewForm {
 
     #[by(id = "work_fandom_autocomplete")]
     fandoms: ElementResolver<Autocomplete>,
+
     #[by(id = "work_relationship_autocomplete")]
     relationships: ElementResolver<Autocomplete>,
+
     #[by(id = "work_character_autocomplete")]
     characters: ElementResolver<Autocomplete>,
+
     #[by(id = "work_freeform_autocomplete")]
     other_tags: ElementResolver<Autocomplete>,
 

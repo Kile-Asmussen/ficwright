@@ -98,7 +98,7 @@ async fn start_gecko(opts: &FicwrightOpts) -> Result<Child> {
         .stderr(err)
         .spawn()?;
 
-    tokio::time::sleep(Duration::from_millis(1000)).await;
+    tokio::time::sleep(Duration::from_millis(500)).await;
 
     Ok(child)
 }
@@ -132,8 +132,8 @@ struct Ao3Command {
 
 impl Ao3Command {
     pub async fn run(self) -> Result<()> {
-        let mut driver =
-            WebDriver::new("http://localhost:4444", DesiredCapabilities::firefox()).await?;
+        let mut capabilities = DesiredCapabilities::firefox();
+        let mut driver = WebDriver::new("http://localhost:4444", capabilities).await?;
 
         driver.ao3("").await?;
 

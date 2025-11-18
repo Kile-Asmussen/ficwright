@@ -1,0 +1,34 @@
+[fic]
+url = ""
+co_authors = []
+title = "Untitled"
+file = "untitled.md"
+start_note = ""
+end_note = ""
+summary = "Presented without summary"
+
+[tags]
+rating = "Not Rated"
+warnings = ["Chose Not To Use Archive Warnings"]
+fandoms = []
+categories = []
+relationships = []
+characters = []
+other = []
+
+[meta]
+format = "Markdown"
+language = ""
+challenges = []
+gift_to = []
+total_chapters = 0
+
+[chapters.01]
+url = ""
+co_authors = []
+title = ""
+
+[chapters.02]
+url = ""
+co_authors = []
+title = ""
