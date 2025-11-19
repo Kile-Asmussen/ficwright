@@ -32,6 +32,7 @@ impl Runnable for TemplateCommand {
                     "01".to_string() => Default::default(),
                     "02".to_string() => Default::default(),
                 },
+                remix: None,
             })?,
         )
         .await?;

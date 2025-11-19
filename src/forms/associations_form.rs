@@ -2,6 +2,7 @@ use thirtyfour::components::{Component, ElementResolver};
 
 use thirtyfour::{By, WebElement};
 
+use crate::Result;
 use crate::config::{FicDetails, FicMeta};
 use crate::forms::{Autocomplete, AutocompleteEntry, Checkbox, DropdownSelector};
 
@@ -43,7 +44,9 @@ pub struct AssociationsForm {
 }
 
 impl AssociationsForm {
-    pub async fn set_all(&self, fic: &FicDetails, meta: &FicMeta) -> Self {}
+    pub async fn set_all(&self, fic: &FicDetails, meta: &FicMeta) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[derive(Debug, Clone, Component)]
